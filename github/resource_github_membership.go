@@ -122,10 +122,16 @@ func resourceGithubMembershipDelete(d *schema.ResourceData, meta interface{}) er
 
 	client := meta.(*Owner).v3client
 	orgName := meta.(*Owner).name
+	username := d.Get("username").(string)
 	ctx := context.WithValue(context.Background(), ctxId, d.Id())
 
-	_, err = client.Organizations.RemoveOrgMembership(ctx,
-		d.Get("username").(string), orgName)
+	_, _, err = client.Organizations.EditOrgMembership(ctx,
+		username,
+		orgName,
+		&github.Membership{
+			Role: github.String("member"),
+		},
+	)
 
 	return err
 }
